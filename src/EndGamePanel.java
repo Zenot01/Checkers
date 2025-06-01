@@ -51,7 +51,6 @@ public class EndGamePanel extends JPanel {
   private void handleButton(JButton button){
     button.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent e) {
-        //TODO endgamepanel znika i pojawia sie na nowo starting panel i atrybuty konca gry sa zerowane
         Players.endGame = false;
         setVisible(false);
         startingPanel.setVisible(true);
