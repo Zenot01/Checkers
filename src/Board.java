@@ -41,13 +41,16 @@ public class Board extends JPanel {
     });
   }
 
+
   public void setEndGamePanel(EndGamePanel endGamePanel) {
     this.endGamePanel = endGamePanel;
   }
 
+
   public void setStatPanel(StatPanel statPanel) {
     this.statPanel = statPanel;
   }
+
 
   private void handleEndGame(){
     Players.endGame = true;
@@ -55,6 +58,7 @@ public class Board extends JPanel {
     statPanel.setVisible(false);
     endGamePanel.setVisible(true);
   }
+
 
   private void choosePawn(int row, int column){
     if (Players.round == Players.round_n.PLAYERTWO)
@@ -98,6 +102,7 @@ public class Board extends JPanel {
           }
           Players.playerTwo.get(i).x = column;
           Players.playerTwo.get(i).y = row;
+          promoteToKing(row, i);
           choosed = false;
           errorMove = false;
         }
@@ -112,6 +117,7 @@ public class Board extends JPanel {
           }
           Players.playerOne.get(i).x = column;
           Players.playerOne.get(i).y = row;
+          promoteToKing(row, i);
           choosed = false;
           errorMove = false;
         }
@@ -158,6 +164,22 @@ public class Board extends JPanel {
     }
   }
 
+
+  private void promoteToKing(int row, int ind){
+    if (Players.round == Players.round_n.PLAYERTWO){
+      if (row == 0){
+        Players.playerTwoKings.add(new Point(Players.playerTwo.get(ind).x, Players.playerTwo.get(ind).y));
+        Players.playerTwo.remove(ind);
+      }
+    }else if (Players.round == Players.round_n.PLAYERONE){
+      if (row == 9){
+        Players.playerOneKings.add(new Point(Players.playerOne.get(ind).x, Players.playerOne.get(ind).y));
+        Players.playerOne.remove(ind);
+      }
+    }
+  }
+
+
   @Override
   public void paintComponent(Graphics g) {
     super.paintComponent(g);
@@ -201,6 +223,19 @@ public class Board extends JPanel {
     if (choosed){
       g.setColor(new Color(64, 224, 208));
       g.fillOval(choosenPawn.x * 70 + 10, choosenPawn.y * 70 + 10, 50, 50);
+    }
+
+    for (int i = 0; i < Players.playerOneKings.size(); ++i){
+      g.setColor(new Color(120, 72, 33));
+      g.fillOval(Players.playerOneKings.get(i).x * 70 + 10, Players.playerOneKings.get(i).y * 70 + 10, 50, 50);
+      g.setColor(Color.WHITE);
+      g.fillOval(Players.playerOneKings.get(i).x * 70 + 20, Players.playerOneKings.get(i).y * 70 + 20, 30, 30);
+    }
+    for (int i = 0; i < Players.playerTwoKings.size(); ++i){
+      g.setColor(new Color(255, 239, 184));
+      g.fillOval(Players.playerTwoKings.get(i).x * 70 + 10, Players.playerTwoKings.get(i).y * 70 + 10, 50, 50);
+      g.setColor(Color.WHITE);
+      g.fillOval(Players.playerTwoKings.get(i).x * 70 + 20, Players.playerTwoKings.get(i).y * 70 + 20, 30, 30);
     }
   }
 

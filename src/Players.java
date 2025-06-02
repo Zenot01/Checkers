@@ -3,6 +3,8 @@ import java.util.ArrayList;
 public class Players{
   public static ArrayList<Point> playerOne = new ArrayList<>();
   public static ArrayList<Point> playerTwo = new ArrayList<>();
+  public static ArrayList<Point> playerOneKings = new ArrayList<>();
+  public static ArrayList<Point> playerTwoKings = new ArrayList<>();
   public static round_n round = round_n.PLAYERTWO;
   public enum round_n{
     PLAYERONE,
@@ -14,6 +16,8 @@ public class Players{
   public static void startGame(){
     playerOne.clear();
     playerTwo.clear();
+    playerOneKings.clear();
+    playerTwoKings.clear();
     for (int rows = 0; rows < 4; ++rows)
     {
       for (int columns = 0; columns < 10; ++columns)
