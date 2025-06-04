@@ -132,7 +132,7 @@ public class Board extends JPanel {
     if (row == toRow && column == toColumn){ErrorMessage.wrongMove(); return -1;}
     if (!(row + 1 == toRow || row - 1 == toRow)){ErrorMessage.wrongMove(); return -1;}
     if (!(column + 1 == toColumn || column - 1 == toColumn)){ErrorMessage.wrongMove(); return -1;}
-    if (checkBeating() == -1) {ErrorMessage.wrongMove(); return -1;}
+    if (checkBeating() == -1) {ErrorMessage.possibleBeating(); return -1;}
 
     return 0;
   }
@@ -141,11 +141,21 @@ public class Board extends JPanel {
   private int checkBeating(){
     if (Players.round == Players.round_n.PLAYERTWO){
       for (int i = 0; i < Players.playerOne.size(); ++i){
-        if ((Players.playerOne.get(i).x == choosenPawn.x + 1 || Players.playerOne.get(i).x == choosenPawn.x - 1) && (Players.playerOne.get(i).y == choosenPawn.y + 1 || Players.playerOne.get(i).y == choosenPawn.y - 1)) return -1;
+        if ((Players.playerOne.get(i).x == choosenPawn.x + 1 || Players.playerOne.get(i).x == choosenPawn.x - 1) && (Players.playerOne.get(i).y == choosenPawn.y + 1 || Players.playerOne.get(i).y == choosenPawn.y - 1)){
+          for (int k = 0; k < Players.playerOne.size(); ++k){
+            if ((Players.playerOne.get(k).x == choosenPawn.x + 2 || Players.playerOne.get(k).x == choosenPawn.x - 2) && (Players.playerOne.get(k).y == choosenPawn.y + 2 || Players.playerOne.get(k).y == choosenPawn.y - 2)) return 0;
+          }
+          return -1;
+        }
       }
     } else if (Players.round == Players.round_n.PLAYERONE){
       for (int i = 0; i < Players.playerTwo.size(); ++i){
-        if ((Players.playerTwo.get(i).x == choosenPawn.x + 1 || Players.playerTwo.get(i).x == choosenPawn.x - 1) && (Players.playerTwo.get(i).y == choosenPawn.y + 1 || Players.playerTwo.get(i).y == choosenPawn.y - 1)) return -1;
+        if ((Players.playerTwo.get(i).x == choosenPawn.x + 1 || Players.playerTwo.get(i).x == choosenPawn.x - 1) && (Players.playerTwo.get(i).y == choosenPawn.y + 1 || Players.playerTwo.get(i).y == choosenPawn.y - 1)){
+          for (int k = 0; k < Players.playerTwo.size(); ++k){
+            if ((Players.playerTwo.get(k).x == choosenPawn.x + 2 || Players.playerTwo.get(k).x == choosenPawn.x - 2) && (Players.playerTwo.get(k).y == choosenPawn.y + 2 || Players.playerTwo.get(k).y == choosenPawn.y - 2)) return 0;
+          }
+          return -1;
+        }
       }
     }
 
