@@ -106,7 +106,11 @@ public class Board extends JPanel {
 
   private int checkMove(int row, int column, int toRow, int toColumn){
     if (row == toRow && column == toColumn){ErrorMessage.wrongMove(); return -1;}
-    //if (Players.round == Players.round_n.PLAYERTWO && toRow >)
+    if (Players.round == Players.round_n.PLAYERTWO && Players.board[row][column] == 2){
+      if (toRow > row) {ErrorMessage.wrongMove(); return -1;}
+    } else if (Players.round == Players.round_n.PLAYERONE && Players.board[row][column] == 1){
+      if (toRow < row) {ErrorMessage.wrongMove(); return -1;}
+    }
     if (!(row + 1 == toRow || row - 1 == toRow)){ErrorMessage.wrongMove(); return -1;}
     if (!(column + 1 == toColumn || column - 1 == toColumn)){ErrorMessage.wrongMove(); return -1;}
     if (Players.board[toRow][toColumn] != 0) {ErrorMessage.wrongMove(); return -1;}
