@@ -123,21 +123,37 @@ public class Board extends JPanel {
         }
       }
     }
-    checkBeating(row, column);
+    handleBeating(row, column);
     repaint();
   }
 
 
   private int checkMove(int row, int column, int toRow, int toColumn){
-    if (row == toRow && column == toColumn){ ErrorMessage.wrongMove(); return -1;}
-    if (!(row + 1 == toRow || row - 1 == toRow)){ ErrorMessage.wrongMove(); return -1;}
-    if (!(column + 1 == toColumn || column - 1 == toColumn)){ ErrorMessage.wrongMove(); return -1;}
+    if (row == toRow && column == toColumn){ErrorMessage.wrongMove(); return -1;}
+    if (!(row + 1 == toRow || row - 1 == toRow)){ErrorMessage.wrongMove(); return -1;}
+    if (!(column + 1 == toColumn || column - 1 == toColumn)){ErrorMessage.wrongMove(); return -1;}
+    if (checkBeating() == -1) {ErrorMessage.wrongMove(); return -1;}
 
     return 0;
   }
 
 
-  private void checkBeating(int toRow, int toColumn){
+  private int checkBeating(){
+    if (Players.round == Players.round_n.PLAYERTWO){
+      for (int i = 0; i < Players.playerOne.size(); ++i){
+        if ((Players.playerOne.get(i).x == choosenPawn.x + 1 || Players.playerOne.get(i).x == choosenPawn.x - 1) && (Players.playerOne.get(i).y == choosenPawn.y + 1 || Players.playerOne.get(i).y == choosenPawn.y - 1)) return -1;
+      }
+    } else if (Players.round == Players.round_n.PLAYERONE){
+      for (int i = 0; i < Players.playerTwo.size(); ++i){
+        if ((Players.playerTwo.get(i).x == choosenPawn.x + 1 || Players.playerTwo.get(i).x == choosenPawn.x - 1) && (Players.playerTwo.get(i).y == choosenPawn.y + 1 || Players.playerTwo.get(i).y == choosenPawn.y - 1)) return -1;
+      }
+    }
+
+    return 0;
+  }
+
+
+  private void handleBeating(int toRow, int toColumn){
     if (Players.round == Players.round_n.PLAYERTWO){
       for (int i = 0; i < Players.playerOne.size(); ++i){
         if (Players.playerOne.get(i).x == toColumn && Players.playerOne.get(i).y == toRow){
