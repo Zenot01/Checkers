@@ -1,10 +1,15 @@
 import java.util.ArrayList;
+import java.util.List;
 
 public class Players{
-  public static ArrayList<Point> playerOne = new ArrayList<>();
-  public static ArrayList<Point> playerTwo = new ArrayList<>();
-  public static ArrayList<Point> playerOneKings = new ArrayList<>();
-  public static ArrayList<Point> playerTwoKings = new ArrayList<>();
+
+//  0 - empty
+//  1 - playerOne pawn
+//  2 - playerTwo pawn
+//  10 - playerOne king
+//  20 - playerTwo king
+  public static int[][] board = new int[10][10];
+
   public static round_n round = round_n.PLAYERTWO;
   public enum round_n{
     PLAYERONE,
@@ -14,18 +19,21 @@ public class Players{
   protected static round_n winner;
 
   public static void startGame(){
-    playerOne.clear();
-    playerTwo.clear();
-    playerOneKings.clear();
-    playerTwoKings.clear();
+    for (int i = 0; i < 10; ++i){
+      for (int k = 0; k < 10; ++k){
+        board[i][k] = 0;
+      }
+    }
+
+
     for (int rows = 0; rows < 4; ++rows)
     {
       for (int columns = 0; columns < 10; ++columns)
       {
         if ((rows % 2 == 0 && columns % 2 == 0) || (rows % 2 != 0 && columns % 2 != 0))
         {
-          playerOne.add(new Point(columns, rows));
-          playerTwo.add(new Point(columns, rows + 6));
+          board[rows][columns] = 1;
+          board[rows + 6][columns] = 2;
         }
       }
     }

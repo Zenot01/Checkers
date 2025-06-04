@@ -13,8 +13,8 @@ public class Board extends JPanel {
   private StatPanel statPanel;
   private EndGamePanel endGamePanel;
 
-  public Board(){
-    setBounds(0,50, 700, 700);
+  public Board() {
+    setBounds(0, 50, 700, 700);
     setVisible(false);
 
     addMouseListener(new MouseAdapter() {
@@ -61,147 +61,68 @@ public class Board extends JPanel {
 
 
   private void choosePawn(int row, int column){
-    if (Players.round == Players.round_n.PLAYERTWO)
-    {
-      for (int i = 0; i < Players.playerTwo.size(); ++i){
-        if (Players.playerTwo.get(i).y == row && Players.playerTwo.get(i).x == column){
-          choosenPawn.y = row;
-          choosenPawn.x = column;
-          choosed = true;
-          repaint();
-          errorChoose = false;
-          return;
-        }
+    if (Players.round == Players.round_n.PLAYERONE){
+      if (Players.board[row][column] == 1 || Players.board[row][column] == 10){
+        choosenPawn.y = row;
+        choosenPawn.x = column;
+        choosed = true;
+        errorChoose = false;
+        repaint();
+        return;
+      }
+    } else if (Players.round == Players.round_n.PLAYERTWO){
+      if (Players.board[row][column] == 2 || Players.board[row][column] == 20){
+        choosenPawn.y = row;
+        choosenPawn.x = column;
+        choosed = true;
+        errorChoose = false;
+        repaint();
+        return;
       }
     }
-    else if (Players.round == Players.round_n.PLAYERONE)
-    {
-      for (int i = 0; i < Players.playerOne.size(); ++i){
-        if (Players.playerOne.get(i).y == row && Players.playerOne.get(i).x == column){
-          choosenPawn.y = row;
-          choosenPawn.x = column;
-          choosed = true;
-          repaint();
-          errorChoose = false;
-          return;
-        }
-      }
-    }
+
     ErrorMessage.wrongPawn();
     errorChoose = true;
   }
 
 
-  private void handlePawn(int row, int column){
-    if(Players.round == Players.round_n.PLAYERTWO){
-      for (int i = 0; i < Players.playerTwo.size(); ++i){
-        if (Players.playerTwo.get(i).x == choosenPawn.x && Players.playerTwo.get(i).y == choosenPawn.y){
-          if (checkMove(Players.playerTwo.get(i).y, Players.playerTwo.get(i).x, row, column) == -1){
-            errorMove = true;
-            return;
-          }
-          Players.playerTwo.get(i).x = column;
-          Players.playerTwo.get(i).y = row;
-          promoteToKing(row, i);
-          choosed = false;
-          errorMove = false;
-        }
-      }
+  private void handlePawn(int toRow, int toColumn){
+    if (checkMove(choosenPawn.y, choosenPawn.x, toRow, toColumn) == -1){
+      errorMove = true;
+      return;
     }
-    else if(Players.round == Players.round_n.PLAYERONE){
-      for (int i = 0; i < Players.playerOne.size(); ++i){
-        if (Players.playerOne.get(i).x == choosenPawn.x && Players.playerOne.get(i).y == choosenPawn.y){
-          if (checkMove(Players.playerOne.get(i).y, Players.playerOne.get(i).x, row, column) == -1){
-            errorMove = true;
-            return;
-          }
-          Players.playerOne.get(i).x = column;
-          Players.playerOne.get(i).y = row;
-          promoteToKing(row, i);
-          choosed = false;
-          errorMove = false;
-        }
-      }
-    }
-    handleBeating(row, column);
+    Players.board[choosenPawn.y][choosenPawn.x] = 0;
+    if (Players.round == Players.round_n.PLAYERONE) Players.board[toRow][toColumn] = 1;
+    else Players.board[toRow][toColumn] = 2;
+    promoteToKing(toRow, toColumn);
+    choosed = false;
+    errorMove = false;
+
+
+    //handleBeating(row, column);
     repaint();
   }
 
 
   private int checkMove(int row, int column, int toRow, int toColumn){
     if (row == toRow && column == toColumn){ErrorMessage.wrongMove(); return -1;}
+    //if (Players.round == Players.round_n.PLAYERTWO && toRow >)
     if (!(row + 1 == toRow || row - 1 == toRow)){ErrorMessage.wrongMove(); return -1;}
     if (!(column + 1 == toColumn || column - 1 == toColumn)){ErrorMessage.wrongMove(); return -1;}
-    if (checkBeating() == -1) {ErrorMessage.possibleBeating(); return -1;}
+    if (Players.board[toRow][toColumn] != 0) {ErrorMessage.wrongMove(); return -1;}
+    //if (checkBeating(row, column, toRow, toColumn) == -1) {ErrorMessage.possibleBeating(); return -1;}
 
     return 0;
   }
 
 
-  private int checkBeating(){
-    if (Players.round == Players.round_n.PLAYERTWO){
-      for (int i = 0; i < Players.playerOne.size(); ++i){
-        if ((Players.playerOne.get(i).x == choosenPawn.x + 1 || Players.playerOne.get(i).x == choosenPawn.x - 1) && (Players.playerOne.get(i).y == choosenPawn.y + 1 || Players.playerOne.get(i).y == choosenPawn.y - 1)){
-          for (int k = 0; k < Players.playerOne.size(); ++k){
-            if ((Players.playerOne.get(k).x == choosenPawn.x + 2 || Players.playerOne.get(k).x == choosenPawn.x - 2) && (Players.playerOne.get(k).y == choosenPawn.y + 2 || Players.playerOne.get(k).y == choosenPawn.y - 2)) return 0;
-          }
-          return -1;
-        }
-      }
-    } else if (Players.round == Players.round_n.PLAYERONE){
-      for (int i = 0; i < Players.playerTwo.size(); ++i){
-        if ((Players.playerTwo.get(i).x == choosenPawn.x + 1 || Players.playerTwo.get(i).x == choosenPawn.x - 1) && (Players.playerTwo.get(i).y == choosenPawn.y + 1 || Players.playerTwo.get(i).y == choosenPawn.y - 1)){
-          for (int k = 0; k < Players.playerTwo.size(); ++k){
-            if ((Players.playerTwo.get(k).x == choosenPawn.x + 2 || Players.playerTwo.get(k).x == choosenPawn.x - 2) && (Players.playerTwo.get(k).y == choosenPawn.y + 2 || Players.playerTwo.get(k).y == choosenPawn.y - 2)) return 0;
-          }
-          return -1;
-        }
-      }
-    }
-
-    return 0;
-  }
 
 
-  private void handleBeating(int toRow, int toColumn){
-    if (Players.round == Players.round_n.PLAYERTWO){
-      for (int i = 0; i < Players.playerOne.size(); ++i){
-        if (Players.playerOne.get(i).x == toColumn && Players.playerOne.get(i).y == toRow){
-          Players.playerOne.remove(i);
-          if (Players.playerOne.isEmpty()){
-            Players.winner = Players.round_n.PLAYERTWO;
-            handleEndGame();
-          }
-          return;
-        }
-      }
-    }
-    else if (Players.round == Players.round_n.PLAYERONE){
-      for (int i = 0; i < Players.playerTwo.size(); ++i){
-        if (Players.playerTwo.get(i).x == toColumn && Players.playerTwo.get(i).y == toRow){
-          Players.playerTwo.remove(i);
-          if (Players.playerTwo.isEmpty()){
-            Players.winner = Players.round_n.PLAYERONE;
-            handleEndGame();
-          }
-          return;
-        }
-      }
-    }
-  }
-
-
-  private void promoteToKing(int row, int ind){
-    if (Players.round == Players.round_n.PLAYERTWO){
-      if (row == 0){
-        Players.playerTwoKings.add(new Point(Players.playerTwo.get(ind).x, Players.playerTwo.get(ind).y));
-        Players.playerTwo.remove(ind);
-      }
-    }else if (Players.round == Players.round_n.PLAYERONE){
-      if (row == 9){
-        Players.playerOneKings.add(new Point(Players.playerOne.get(ind).x, Players.playerOne.get(ind).y));
-        Players.playerOne.remove(ind);
-      }
+  private void promoteToKing(int row, int column){
+   if (row == 0 && Players.board[row][column] == 2){
+     Players.board[row][column] = 20;
+    }else if (row == 10 && Players.board[row][column] == 1){
+      Players.board[row][column] = 10;
     }
   }
 
@@ -236,33 +157,39 @@ public class Board extends JPanel {
 
 
   private void paintPawns(Graphics g){
-    g.setColor(new Color(120, 72, 33));
-    for(int i = 0; i < Players.playerOne.size(); ++i){
-      g.fillOval(Players.playerOne.get(i).x * 70 + 10, Players.playerOne.get(i).y * 70 + 10, 50, 50);
+    for (int row = 0; row < 10; ++row){
+      for (int column = 0; column < 10; ++column){
+
+        if (Players.board[row][column] == 2){
+          g.setColor(new Color(255, 239, 184));
+          g.fillOval(column * 70 + 10, row * 70 + 10, 50, 50);
+        }
+
+        if (Players.board[row][column] == 1){
+          g.setColor(new Color(120, 72, 33));
+          g.fillOval(column * 70 + 10, row * 70 + 10, 50, 50);
+        }
+
+        if (Players.board[row][column] == 20){
+          g.setColor(new Color(255, 239, 184));
+          g.fillOval(column * 70 + 10, row * 70 + 10, 50, 50);
+          g.setColor(Color.WHITE);
+          g.fillOval(column * 70 + 20, row * 70 + 20, 30, 30);
+        }
+
+        if (Players.board[row][column] == 10){
+          g.setColor(new Color(120, 72, 33));
+          g.fillOval(column * 70 + 10, row * 70 + 10, 50, 50);
+          g.setColor(Color.WHITE);
+          g.fillOval(column * 70 + 20, row * 70 + 20, 30, 30);
+        }
+      }
     }
 
-    g.setColor(new Color(255, 239, 184));
-    for(int i = 0; i < Players.playerTwo.size(); ++i){
-      g.fillOval(Players.playerTwo.get(i).x * 70 + 10, Players.playerTwo.get(i).y * 70 + 10, 50, 50);
-    }
 
     if (choosed){
       g.setColor(new Color(64, 224, 208));
       g.fillOval(choosenPawn.x * 70 + 10, choosenPawn.y * 70 + 10, 50, 50);
     }
-
-    for (int i = 0; i < Players.playerOneKings.size(); ++i){
-      g.setColor(new Color(120, 72, 33));
-      g.fillOval(Players.playerOneKings.get(i).x * 70 + 10, Players.playerOneKings.get(i).y * 70 + 10, 50, 50);
-      g.setColor(Color.WHITE);
-      g.fillOval(Players.playerOneKings.get(i).x * 70 + 20, Players.playerOneKings.get(i).y * 70 + 20, 30, 30);
-    }
-    for (int i = 0; i < Players.playerTwoKings.size(); ++i){
-      g.setColor(new Color(255, 239, 184));
-      g.fillOval(Players.playerTwoKings.get(i).x * 70 + 10, Players.playerTwoKings.get(i).y * 70 + 10, 50, 50);
-      g.setColor(Color.WHITE);
-      g.fillOval(Players.playerTwoKings.get(i).x * 70 + 20, Players.playerTwoKings.get(i).y * 70 + 20, 30, 30);
-    }
   }
-
 }
