@@ -12,6 +12,7 @@ public class Board extends JPanel {
   protected boolean endGame = false;
   private StatPanel statPanel;
   private EndGamePanel endGamePanel;
+  private boolean[] beatings = new boolean[4];
 
   public Board() {
     setBounds(0, 50, 700, 700);
@@ -61,28 +62,86 @@ public class Board extends JPanel {
 
 
   private void choosePawn(int row, int column){
-    if (Players.round == Players.round_n.PLAYERONE){
-      if (Players.board[row][column] == 1 || Players.board[row][column] == 10){
-        choosenPawn.y = row;
-        choosenPawn.x = column;
-        choosed = true;
-        errorChoose = false;
-        repaint();
-        return;
-      }
-    } else if (Players.round == Players.round_n.PLAYERTWO){
-      if (Players.board[row][column] == 2 || Players.board[row][column] == 20){
-        choosenPawn.y = row;
-        choosenPawn.x = column;
-        choosed = true;
-        errorChoose = false;
-        repaint();
-        return;
+    if (checkPawn(row, column)){
+      if (Players.round == Players.round_n.PLAYERONE){
+        if (Players.board[row][column] == 1 || Players.board[row][column] == 10){
+          choosenPawn.y = row;
+          choosenPawn.x = column;
+          choosed = true;
+          errorChoose = false;
+          repaint();
+          return;
+        }
+      } else if (Players.round == Players.round_n.PLAYERTWO){
+        if (Players.board[row][column] == 2 || Players.board[row][column] == 20){
+          choosenPawn.y = row;
+          choosenPawn.x = column;
+          choosed = true;
+          errorChoose = false;
+          repaint();
+          return;
+        }
       }
     }
-
     ErrorMessage.wrongPawn();
     errorChoose = true;
+  }
+
+
+  private boolean checkPawn(int choosedRow, int choosedColumn){
+    boolean ok = false;
+    boolean possibleBeating = false;
+
+    for (int row = 0; row < 10; row++) {
+      for (int column = 0; column < 10; column++) {
+        if (Players.board[row][column] == 2){
+          //check right
+          if (column < 8){
+            //top right
+            if (row > 1){
+              if (Players.board[row - 1][column + 1] == 1 && Players.board[row - 2][column + 2] == 0){
+                if (choosedRow == row && choosedColumn == column) ok = true;
+                possibleBeating = true;
+              }
+            }
+          }
+          //check left
+          if (column > 1){
+            //top left
+            if (row > 1){
+              if (Players.board[row - 1][column - 1] == 1 && Players.board[row - 2][column - 2] == 0){
+                if (choosedRow == row && choosedColumn == column) ok = true;
+                possibleBeating = true;
+              }
+            }
+          }
+        } else if (Players.board[row][column] == 1){
+          //check right
+          if (column < 8){
+            //bottom right
+            if (row > 8){
+              if (Players.board[row + 1][column + 1] == 2 && Players.board[row + 2][column + 2] == 0){
+                if (choosedRow == row && choosedColumn == column) ok = true;
+                possibleBeating = true;
+              }
+            }
+          }
+          //check left
+          if (column > 1){
+            //bottom left
+            if (row > 8){
+              if (Players.board[row + 1][column - 1] == 2 && Players.board[row + 2][column - 2] == 0){
+                if (choosedRow == row && choosedColumn == column) ok = true;
+                possibleBeating = true;
+              }
+            }
+          }
+        }
+      }
+    }
+    if (possibleBeating && !ok) return false;
+
+    return true;
   }
 
 
@@ -91,6 +150,7 @@ public class Board extends JPanel {
       errorMove = true;
       return;
     }
+    handleBeating(choosenPawn.y, choosenPawn.x);
     Players.board[choosenPawn.y][choosenPawn.x] = 0;
     if (Players.round == Players.round_n.PLAYERONE) Players.board[toRow][toColumn] = 1;
     else Players.board[toRow][toColumn] = 2;
@@ -98,28 +158,102 @@ public class Board extends JPanel {
     choosed = false;
     errorMove = false;
 
-
-    //handleBeating(row, column);
     repaint();
+  }
+
+
+  private void handleBeating(int row, int column){
+    if (beatings[0]){
+      Players.board[row - 1][column + 1] = 0;
+    } else if (beatings[1]){
+      Players.board[row + 1][column + 1] = 0;
+    } else if (beatings[2]){
+      Players.board[row - 1][column - 1] = 0;
+    } else if (beatings[3]){
+      Players.board[row + 1][column - 1] = 0;
+    }
   }
 
 
   private int checkMove(int row, int column, int toRow, int toColumn){
     if (row == toRow && column == toColumn){ErrorMessage.wrongMove(); return -1;}
-    if (Players.round == Players.round_n.PLAYERTWO && Players.board[row][column] == 2){
+
+    int res = checkBeating(row, column, toRow, toColumn);
+    if (res == 1) {ErrorMessage.possibleBeating(); return -1;}
+    else if (res == 2) return 0;
+
+
+    if (Players.round == Players.round_n.PLAYERTWO && Players.board[row][column] == 2){ //TODO add exception and beating for kings
       if (toRow > row) {ErrorMessage.wrongMove(); return -1;}
     } else if (Players.round == Players.round_n.PLAYERONE && Players.board[row][column] == 1){
       if (toRow < row) {ErrorMessage.wrongMove(); return -1;}
     }
     if (!(row + 1 == toRow || row - 1 == toRow)){ErrorMessage.wrongMove(); return -1;}
     if (!(column + 1 == toColumn || column - 1 == toColumn)){ErrorMessage.wrongMove(); return -1;}
+
     if (Players.board[toRow][toColumn] != 0) {ErrorMessage.wrongMove(); return -1;}
-    //if (checkBeating(row, column, toRow, toColumn) == -1) {ErrorMessage.possibleBeating(); return -1;}
 
     return 0;
   }
 
 
+  private int checkBeating(int row, int column, int toRow, int toColumn){
+    boolean execute = false;
+    boolean possible = false;
+    for (int i = 0;i < 4;++i) beatings[i] = false;
+
+    if (Players.board[row][column] == 2){
+      //check right
+      if (column < 8){
+        //top right
+        if (row > 1){
+          if (Players.board[row - 1][column + 1] == 1 && Players.board[row - 2][column + 2] == 0){
+            if (toRow == row - 2 && toColumn == column + 2) execute = true;
+            possible  = true;
+            beatings[0] = true;
+          }
+        }
+      }
+      //check left
+      if (column > 1){
+        //top left
+        if (row > 1){
+          if (Players.board[row - 1][column - 1] == 1 && Players.board[row - 2][column - 2] == 0){
+            if (toRow == row - 2 && toColumn == column - 2) execute = true;
+            possible  = true;
+            beatings[2] = true;
+          }
+        }
+      }
+    } else if (Players.board[row][column] == 1){
+      //check right
+      if (column < 8){
+        //bottom right
+        if (row > 8){
+          if (Players.board[row + 1][column + 1] == 2 && Players.board[row + 2][column + 2] == 0){
+            if (toRow == row + 2 && toColumn == column + 2) execute = true;
+            possible  = true;
+            beatings[1] = true;
+          }
+        }
+      }
+      //check left
+      if (column > 1){
+        //bottom left
+        if (row > 8){
+          if (Players.board[row + 1][column - 1] == 2 && Players.board[row + 2][column - 2] == 0){
+            if (toRow == row + 2 && toColumn == column - 2) execute = true;
+            possible  = true;
+            beatings[3] = true;
+          }
+        }
+      }
+    }
+
+    if (possible && !execute) return 1;
+    if (execute) return 2;
+    return 0;
+  }
 
 
   private void promoteToKing(int row, int column){
