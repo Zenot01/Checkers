@@ -91,6 +91,7 @@ public class Board extends JPanel {
   private boolean checkPawn(int choosedRow, int choosedColumn){
     boolean ok = false;
     boolean possibleBeating = false;
+    for (int i = 0;i < 4;++i) beatings[i] = false;
 
     for (int row = 0; row < 10; row++) {
       for (int column = 0; column < 10; column++) {
@@ -102,6 +103,7 @@ public class Board extends JPanel {
               if (Players.board[row - 1][column + 1] == 1 && Players.board[row - 2][column + 2] == 0){
                 if (choosedRow == row && choosedColumn == column) ok = true;
                 possibleBeating = true;
+                beatings[0] = true;
               }
             }
           }
@@ -112,6 +114,7 @@ public class Board extends JPanel {
               if (Players.board[row - 1][column - 1] == 1 && Players.board[row - 2][column - 2] == 0){
                 if (choosedRow == row && choosedColumn == column) ok = true;
                 possibleBeating = true;
+                beatings[1] = true;
               }
             }
           }
@@ -123,6 +126,7 @@ public class Board extends JPanel {
               if (Players.board[row + 1][column + 1] == 2 && Players.board[row + 2][column + 2] == 0){
                 if (choosedRow == row && choosedColumn == column) ok = true;
                 possibleBeating = true;
+                beatings[2] = true;
               }
             }
           }
@@ -133,6 +137,7 @@ public class Board extends JPanel {
               if (Players.board[row + 1][column - 1] == 2 && Players.board[row + 2][column - 2] == 0){
                 if (choosedRow == row && choosedColumn == column) ok = true;
                 possibleBeating = true;
+                beatings[3] = true;
               }
             }
           }
@@ -200,54 +205,22 @@ public class Board extends JPanel {
   private int checkBeating(int row, int column, int toRow, int toColumn){
     boolean execute = false;
     boolean possible = false;
-    for (int i = 0;i < 4;++i) beatings[i] = false;
 
-    if (Players.board[row][column] == 2){
-      //check right
-      if (column < 8){
-        //top right
-        if (row > 1){
-          if (Players.board[row - 1][column + 1] == 1 && Players.board[row - 2][column + 2] == 0){
-            if (toRow == row - 2 && toColumn == column + 2) execute = true;
-            possible  = true;
-            beatings[0] = true;
-          }
-        }
-      }
-      //check left
-      if (column > 1){
-        //top left
-        if (row > 1){
-          if (Players.board[row - 1][column - 1] == 1 && Players.board[row - 2][column - 2] == 0){
-            if (toRow == row - 2 && toColumn == column - 2) execute = true;
-            possible  = true;
-            beatings[2] = true;
-          }
-        }
-      }
-    } else if (Players.board[row][column] == 1){
-      //check right
-      if (column < 8){
-        //bottom right
-        if (row > 8){
-          if (Players.board[row + 1][column + 1] == 2 && Players.board[row + 2][column + 2] == 0){
-            if (toRow == row + 2 && toColumn == column + 2) execute = true;
-            possible  = true;
-            beatings[1] = true;
-          }
-        }
-      }
-      //check left
-      if (column > 1){
-        //bottom left
-        if (row > 8){
-          if (Players.board[row + 1][column - 1] == 2 && Players.board[row + 2][column - 2] == 0){
-            if (toRow == row + 2 && toColumn == column - 2) execute = true;
-            possible  = true;
-            beatings[3] = true;
-          }
-        }
-      }
+    for (int i = 0; i < 4; i++) {
+      if (beatings[i]) possible = true;
+    }
+
+    if (beatings[0]){
+      if (row - 2 == toRow && column + 2 == toColumn) execute = true;
+    }
+    if (beatings[1]){
+      if (row + 2 == toRow && column + 2 == toColumn) execute = true;
+    }
+    if (beatings[2]){
+      if (row + 2 == toRow && column - 2 == toColumn) execute = true;
+    }
+    if (beatings[3]){
+      if (row - 2 == toRow && column - 2 == toColumn) execute = true;
     }
 
     if (possible && !execute) return 1;
