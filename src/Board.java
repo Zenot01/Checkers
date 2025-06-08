@@ -177,6 +177,20 @@ public class Board extends JPanel {
     } else if (beatings[3]){
       Players.board[row + 1][column - 1] = 0;
     }
+
+    boolean end = true;
+    for (int row_2 = 0; row_2 < 10; row_2++) {
+      for (int column_2 = 0; column_2 < 10; column_2++) {
+        if (Players.round == Players.round_n.PLAYERONE){
+          if (Players.board[row_2][column_2] == 2 || Players.board[row_2][column_2] == 20) end = false;
+        }
+        else{
+          if (Players.board[row_2][column_2] == 1 || Players.board[row_2][column_2] == 10) end = false;
+        }
+      }
+    }
+
+    if (end) handleEndGame();
   }
 
 
